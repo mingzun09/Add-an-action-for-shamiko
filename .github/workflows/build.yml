@@ -1,4 +1,4 @@
-name: Build Encore Zip
+name: Build action shamiko Zip
 
 on:
   pull_request:
@@ -14,8 +14,6 @@ on:
       - 'jni/**'
       - 'scripts/**'
       - 'module/**'
-      - 'webui/**'
-      - 'gamelist.txt'
       - 'version'
 
 # Allow only one concurrent build workflows
