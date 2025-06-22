@@ -1,69 +1,41 @@
-name: Build action shamiko Zip
+name: Build Module
 
 on:
-  pull_request:
-    branches:
-      -main
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/build.yml'
-      - 'META-INF'
-      - 'LICENSE'
-      - 'module.prop'
-      - 'post-fs-data.sh'
-      - 'service.sh'
-
-# Allow only one concurrent build workflows
-concurrency:
-  group: build
-  cancel-in-progress: true
+  workflow_dispatch:    # 允许手动触发
+    inputs:
+      version:
+        description: 'Module version (e.g., 0.7.3)'
+        required: true
+        default: '0.7.3'
 
 jobs:
   build:
-    name: Build Flashable Zip
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4.2.2
-      with:
-        fetch-depth: 0
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-    - name: NDK Setup
-      uses: nttld/setup-ndk@v1.5.0
-      with:
-        ndk-version: r28b
+    - name: Set build date
+      run: echo "BUILD_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v2.0.2
-
-    - name: Build Encore JNI
-      run: ndk-build
-
-    - name: Build WebUI
-      working-directory: ./webui
+    - name: Create module zip
       run: |
-        bun install
-        bun run build
-        cp -r ./dist/* ../module/webroot
+        MODULE_NAME="action_Shamiko"
+        ZIP_NAME="${MODULE_NAME}-${{ github.event.inputs.version }}(${{ env.BUILD_DATE }}).zip"
+        
+        # 创建临时构建目录
+        mkdir -p build/${MODULE_NAME}
+        
+        # 复制所有文件到构建目录（排除.gitignore指定的文件）
+        rsync -av --exclude-from='.gitignore' . build/${MODULE_NAME}/
+        
+        # 进入构建目录并创建zip包
+        cd build
+        zip -r ${ZIP_NAME} ${MODULE_NAME}
+        echo "ZIP_PATH=${ZIP_NAME}" >> $GITHUB_ENV
 
-    - name: Compile Flashable Zip
-      id: compileZip
-      run: bash .github/scripts/compile_zip.sh
-
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v4.6.2
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
       with:
-        name: mingzun-build
-        path: ${{ steps.compileZip.outputs.zipName }}
-
-      run: |
-        if [ ! -z "${{ secrets.CHAT_ID }}" ] && [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
-          export VERSION=$(git rev-list --count HEAD)
-          bash .github/scripts/telegram_bot.sh ${{ steps.compileZip.outputs.zipName }}
-        else
-          echo "Telegram bot token or chatid is undefined, please add it to repository secrets!"
-          exit 1
-        fi
+        name: action_Shamiko-module
+        path: build/${{ env.ZIP_PATH }}
