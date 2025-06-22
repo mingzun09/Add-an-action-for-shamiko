@@ -1,7 +1,7 @@
-name: Build Module
+name: Build Shamiko Module
 
 on:
-  workflow_dispatch:    # 允许手动触发
+  workflow_dispatch:
     inputs:
       version:
         description: 'Module version (e.g., 0.7.3)'
@@ -18,24 +18,27 @@ jobs:
     - name: Set build date
       run: echo "BUILD_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-    - name: Create module zip
+    - name: Create flat module zip
       run: |
-        MODULE_NAME="action_Shamiko"
-        ZIP_NAME="${MODULE_NAME}-${{ github.event.inputs.version }}(${{ env.BUILD_DATE }}).zip"
+        # 设置文件名
+        ZIP_NAME="Shamiko-${{ github.event.inputs.version }}(${{ env.BUILD_DATE }}).zip"
         
-        # 创建临时构建目录
-        mkdir -p build/${MODULE_NAME}
+        # 创建临时目录
+        mkdir -p build
         
-        # 复制所有文件到构建目录（排除.gitignore指定的文件）
-        rsync -av --exclude-from='.gitignore' . build/${MODULE_NAME}/
+        # 直接压缩指定文件到ZIP根目录
+        zip -j build/"$ZIP_NAME" \
+          META-INF/**/* \
+          LICENSE \
+          module.prop \
+          post-fs-data.sh \
+          README.md \
+          service.sh
         
-        # 进入构建目录并创建zip包
-        cd build
-        zip -r ${ZIP_NAME} ${MODULE_NAME}
-        echo "ZIP_PATH=${ZIP_NAME}" >> $GITHUB_ENV
+        echo "ZIP_PATH=$ZIP_NAME" >> $GITHUB_ENV
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: action_Shamiko-module
+        name: shamiko-module
         path: build/${{ env.ZIP_PATH }}
