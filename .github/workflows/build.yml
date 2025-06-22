@@ -10,11 +10,11 @@ on:
       - main
     paths:
       - '.github/workflows/build.yml'
-      - '.github/scripts/**'
-      - 'jni/**'
-      - 'scripts/**'
-      - 'module/**'
-      - 'version'
+      - 'META-INF'
+      - 'LICENSE'
+      - 'module.prop'
+      - 'post-fs-data.sh'
+      - 'service.sh'
 
 # Allow only one concurrent build workflows
 concurrency:
@@ -56,17 +56,9 @@ jobs:
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4.6.2
       with:
-        name: encore-build
+        name: mingzun-build
         path: ${{ steps.compileZip.outputs.zipName }}
 
-    - name: Upload To Telegram
-      env:
-        CHAT_ID: ${{ secrets.CHAT_ID }}
-        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-        COMMIT_URL: ${{ github.event.head_commit.url }}
-        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        TITLE: Encore Tweaks
       run: |
         if [ ! -z "${{ secrets.CHAT_ID }}" ] && [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
           export VERSION=$(git rev-list --count HEAD)
