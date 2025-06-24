@@ -1,4 +1,4 @@
-name: Build Shamiko action Module
+name: Build Shamiko auxiliary Module
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
     - name: Set build date
       run: echo "BUILD_DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-    - name: Create flat module zip
+    - name: Create module zip
       run: |
         # 设置文件名
         ZIP_NAME="Shamiko-${{ github.event.inputs.version }}(${{ env.BUILD_DATE }}).zip"
@@ -26,9 +26,9 @@ jobs:
         # 创建临时目录
         mkdir -p build
         
-        # 直接压缩指定文件到ZIP根目录
-        zip -j build/"$ZIP_NAME" \
-          META-INF/**/* \
+        # 正确打包文件（保留目录结构）
+        zip -r build/"$ZIP_NAME" \
+          META-INF/ \
           LICENSE \
           module.prop \
           post-fs-data.sh \
@@ -40,5 +40,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Shamiko action Module
+        name: Shamiko-auxiliary-Module
         path: build/${{ env.ZIP_PATH }}
