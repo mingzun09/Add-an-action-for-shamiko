@@ -4,3 +4,4 @@ version=v0.4
 versionCode=20250624
 author=mingzun09
 description=A module to assist in the use of shamiko, adding operation buttons to shamiko to quickly switch between operating modes.
+projectUrl=https://github.com/mingzun09/for-adding-shamiko-actions
