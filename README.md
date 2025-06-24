@@ -1,4 +1,4 @@
-# Add-an-action-for-shamiko
+# for adding shamiko actions
 ## 一个辅助使用shamiko的模块
 
 依赖主模块“shamiko"项目链接：https://github.com/LSPosed/LSPosed.github.io
