@@ -1,4 +1,4 @@
-name: Build Shamiko Module
+name: Build Shamiko action Module
 
 on:
   workflow_dispatch:
@@ -40,5 +40,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: shamiko-module
+        name: Shamiko action Module
         path: build/${{ env.ZIP_PATH }}
