@@ -1,6 +1,6 @@
-id=shamiko_action
-name=为shamiko添加action
-version=v1
-versionCode=1
+id=shamiko_auxiliary
+name=shamiko_auxiliary
+version=v0.4
+versionCode=20250624
 author=mingzun09
-description=操作按钮已添加😋
+description=A module to assist in the use of shamiko, adding operation buttons to shamiko to quickly switch between operating modes.
